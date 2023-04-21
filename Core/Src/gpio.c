@@ -54,21 +54,7 @@ void MX_GPIO_Init(void)
   HAL_GPIO_WritePin(DAC_AUDIO_RST_GPIO_Port, DAC_AUDIO_RST_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOA, SEG_23_Pin|SEG_0_Pin|COM_0_Pin|COM_1_Pin
-                          |COM_2_Pin|SEG_10_Pin, GPIO_PIN_RESET);
-
-  /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOC, SEG_22_Pin|SEG_1_Pin|SEG_14_Pin|SEG_9_Pin
-                          |SEG_13_Pin, GPIO_PIN_RESET);
-
-  /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOB, SEG_21_Pin|SEG_2_Pin|SEG_20_Pin|SEG_3_Pin
-                          |SEG_19_Pin|SEG_4_Pin|M3V3_REG_ON_Pin|SEG_11_Pin
-                          |SEG_12_Pin|COM_3_Pin, GPIO_PIN_RESET);
-
-  /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOD, SEG_18_Pin|SEG_5_Pin|SEG_17_Pin|SEG_6_Pin
-                          |SEG_16_Pin|SEG_7_Pin|SEG_15_Pin|SEG_8_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(M3V3_REG_ON_GPIO_Port, M3V3_REG_ON_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin : PtPin */
   GPIO_InitStruct.Pin = DAC_AUDIO_RST_Pin;
@@ -85,43 +71,12 @@ void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_PULLDOWN;
   HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : PAPin PAPin PAPin PAPin
-                           PAPin PAPin */
-  GPIO_InitStruct.Pin = SEG_23_Pin|SEG_0_Pin|COM_0_Pin|COM_1_Pin
-                          |COM_2_Pin|SEG_10_Pin;
+  /*Configure GPIO pin : PtPin */
+  GPIO_InitStruct.Pin = M3V3_REG_ON_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
-
-  /*Configure GPIO pins : PCPin PCPin PCPin PCPin
-                           PCPin */
-  GPIO_InitStruct.Pin = SEG_22_Pin|SEG_1_Pin|SEG_14_Pin|SEG_9_Pin
-                          |SEG_13_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
-  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-  HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
-
-  /*Configure GPIO pins : PBPin PBPin PBPin PBPin
-                           PBPin PBPin PBPin PBPin
-                           PBPin PBPin */
-  GPIO_InitStruct.Pin = SEG_21_Pin|SEG_2_Pin|SEG_20_Pin|SEG_3_Pin
-                          |SEG_19_Pin|SEG_4_Pin|M3V3_REG_ON_Pin|SEG_11_Pin
-                          |SEG_12_Pin|COM_3_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
-  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-  HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
-
-  /*Configure GPIO pins : PDPin PDPin PDPin PDPin
-                           PDPin PDPin PDPin PDPin */
-  GPIO_InitStruct.Pin = SEG_18_Pin|SEG_5_Pin|SEG_17_Pin|SEG_6_Pin
-                          |SEG_16_Pin|SEG_7_Pin|SEG_15_Pin|SEG_8_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
-  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-  HAL_GPIO_Init(GPIOD, &GPIO_InitStruct);
+  HAL_GPIO_Init(M3V3_REG_ON_GPIO_Port, &GPIO_InitStruct);
 
 }
 
