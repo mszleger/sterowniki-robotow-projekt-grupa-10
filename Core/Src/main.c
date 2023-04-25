@@ -61,6 +61,11 @@ void SystemClock_Config(void);
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 // Adding support of printf function - sending data over USART
+void dis(){
+HAL_LCD_Write(&hlcd, 0, 0, 1U << 3 | 1U << 4 | 1U << 22 | 1U << 23);
+HAL_LCD_Write(&hlcd, 2, 0, 1U << 3 | 1U << 22 | 1U << 23);
+HAL_LCD_UpdateDisplayRequest(&hlcd);}
+
 int _write(int file, char *ptr, int len) {
   HAL_UART_Transmit(&huart2, ptr, len, 50);
   return len;
@@ -102,15 +107,46 @@ int main(void)
   MX_LCD_Init();
   /* USER CODE BEGIN 2 */
   // Wyświetlanie litery 'A'
-  HAL_LCD_Write(&hlcd, 0, 0, 1U << 3 | 1U << 4 | 1U << 22 | 1U << 23);
-  HAL_LCD_Write(&hlcd, 2, 0, 1U << 3 | 1U << 22 | 1U << 23);
-  HAL_LCD_UpdateDisplayRequest(&hlcd);
+  //LCD_A_1();
+  //LCD_E_2();
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
   {
+
+	  HAL_LCD_Write(&hlcd, 0, 0,1U << 0 |1U << 1 |1U << 2 |1U << 3 |1U << 4 | 1U << 5 | 1U << 6 |1U << 7 |1U << 8 |1U << 9 |1U << 10 |1U << 11 |1U << 12 |1U << 13 |1U << 14 |1U << 15 |1U << 16 |1U << 17 |1U << 18 |1U << 19 |1U << 20 |1U << 21 |1U << 22 |1U << 23 |1U << 24 |1U << 25 |1U << 26 |1U << 27 |1U << 28 |1U << 29 |1U << 30 |1U << 31);
+	  HAL_LCD_Write(&hlcd, 1, 0,1U << 0 |1U << 1 |1U << 2 |1U << 3 |1U << 4 | 1U << 5 | 1U << 6 |1U << 7 |1U << 8 |1U << 9 |1U << 10 |1U << 11 |1U << 12 |1U << 13 |1U << 14 |1U << 15 |1U << 16 |1U << 17 |1U << 18 |1U << 19 |1U << 20 |1U << 21 |1U << 22 |1U << 23 |1U << 24 |1U << 25 |1U << 26 |1U << 27 |1U << 28 |1U << 29 |1U << 30 |1U << 31);
+	  HAL_LCD_Write(&hlcd, 2, 0,1U << 0 |1U << 1 |1U << 2 |1U << 3 |1U << 4 | 1U << 5 | 1U << 6 |1U << 7 |1U << 8 |1U << 9 |1U << 10 |1U << 11 |1U << 12 |1U << 13 |1U << 14 |1U << 15 |1U << 16 |1U << 17 |1U << 18 |1U << 19 |1U << 20 |1U << 21 |1U << 22 |1U << 23 |1U << 24 |1U << 25 |1U << 26 |1U << 27 |1U << 28 |1U << 29 |1U << 30 |1U << 31);
+	  HAL_LCD_Write(&hlcd, 3, 0,1U << 0 |1U << 1 |1U << 2 |1U << 3 |1U << 4 | 1U << 5 | 1U << 6 |1U << 7 |1U << 8 |1U << 9 |1U << 10 |1U << 11 |1U << 12 |1U << 13 |1U << 14 |1U << 15 |1U << 16 |1U << 17 |1U << 18 |1U << 19 |1U << 20 |1U << 21 |1U << 22 |1U << 23 |1U << 24 |1U << 25 |1U << 26 |1U << 27 |1U << 28 |1U << 29 |1U << 30 |1U << 31);
+	  HAL_LCD_Write(&hlcd, 4, 0,1U << 0 |1U << 1 |1U << 2 |1U << 3 |1U << 4 | 1U << 5 | 1U << 6 |1U << 7 |1U << 8 |1U << 9 |1U << 10 |1U << 11 |1U << 12 |1U << 13 |1U << 14 |1U << 15 |1U << 16 |1U << 17 |1U << 18 |1U << 19 |1U << 20 |1U << 21 |1U << 22 |1U << 23 |1U << 24 |1U << 25 |1U << 26 |1U << 27 |1U << 28 |1U << 29 |1U << 30 |1U << 31);
+	  HAL_LCD_Write(&hlcd, 5, 0,1U << 0 |1U << 1 |1U << 2 |1U << 3 |1U << 4 | 1U << 5 | 1U << 6 |1U << 7 |1U << 8 |1U << 9 |1U << 10 |1U << 11 |1U << 12 |1U << 13 |1U << 14 |1U << 15 |1U << 16 |1U << 17 |1U << 18 |1U << 19 |1U << 20 |1U << 21 |1U << 22 |1U << 23 |1U << 24 |1U << 25 |1U << 26 |1U << 27 |1U << 28 |1U << 29 |1U << 30 |1U << 31);
+	  HAL_LCD_Write(&hlcd, 6, 0,1U << 0 |1U << 1 |1U << 2 |1U << 3 |1U << 4 | 1U << 5 | 1U << 6 |1U << 7 |1U << 8 |1U << 9 |1U << 10 |1U << 11 |1U << 12 |1U << 13 |1U << 14 |1U << 15 |1U << 16 |1U << 17 |1U << 18 |1U << 19 |1U << 20 |1U << 21 |1U << 22 |1U << 23 |1U << 24 |1U << 25 |1U << 26 |1U << 27 |1U << 28 |1U << 29 |1U << 30 |1U << 31);
+	  HAL_LCD_Write(&hlcd, 7, 0,1U << 0 |1U << 1 |1U << 2 |1U << 3 |1U << 4 | 1U << 5 | 1U << 6 |1U << 7 |1U << 8 |1U << 9 |1U << 10 |1U << 11 |1U << 12 |1U << 13 |1U << 14 |1U << 15 |1U << 16 |1U << 17 |1U << 18 |1U << 19 |1U << 20 |1U << 21 |1U << 22 |1U << 23 |1U << 24 |1U << 25 |1U << 26 |1U << 27 |1U << 28 |1U << 29 |1U << 30 |1U << 31);
+
+	  HAL_LCD_UpdateDisplayRequest(&hlcd);
+
+	  /*
+	  uint32_t c1 = 1U << 6 | 1U << 13 | 1U << 5 | 1U << 12;
+	  uint32_t c2 = 1U << 3 | 1U << 4 | 1U << 22 | 1U << 23;
+	  uint32_t c = c1+c2;
+
+		HAL_LCD_Write(&hlcd, 0, 0, c);
+	    HAL_LCD_Write(&hlcd, 2, 0, 1U << 3 | 1U << 22 | 1U << 23 | 1U << 13 | 1U << 12 | 1U << 5);
+	    HAL_LCD_UpdateDisplayRequest(&hlcd);*/
+
+	/*  HAL_LCD_Write(&hlcd, 0, 0, RAM0);
+	  HAL_LCD_Write(&hlcd, 1, 0, RAM1);
+	  HAL_LCD_Write(&hlcd, 2, 0, RAM2);
+	  HAL_LCD_UpdateDisplayRequest(&hlcd);*/
+	 // LCD_A_1();
+
+/*display_lcd("a");
+HAL_Delay(2000);
+HAL_LCD_Clear(&hlcd);
+HAL_Delay(2000);*/
+
 
     /* USER CODE END WHILE */
 
@@ -146,7 +182,7 @@ void SystemClock_Config(void)
   RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
   RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_MSI;
   RCC_OscInitStruct.PLL.PLLM = 1;
-  RCC_OscInitStruct.PLL.PLLN = 20;
+  RCC_OscInitStruct.PLL.PLLN = 40;
   RCC_OscInitStruct.PLL.PLLP = RCC_PLLP_DIV7;
   RCC_OscInitStruct.PLL.PLLQ = RCC_PLLQ_DIV2;
   RCC_OscInitStruct.PLL.PLLR = RCC_PLLR_DIV2;
@@ -159,11 +195,11 @@ void SystemClock_Config(void)
   RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK|RCC_CLOCKTYPE_SYSCLK
                               |RCC_CLOCKTYPE_PCLK1|RCC_CLOCKTYPE_PCLK2;
   RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
-  RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV2;
+  RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
   RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV1;
   RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
 
-  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_1) != HAL_OK)
+  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_4) != HAL_OK)
   {
     Error_Handler();
   }
@@ -175,7 +211,7 @@ void SystemClock_Config(void)
   PeriphClkInit.RTCClockSelection = RCC_RTCCLKSOURCE_LSI;
   PeriphClkInit.PLLSAI1.PLLSAI1Source = RCC_PLLSOURCE_MSI;
   PeriphClkInit.PLLSAI1.PLLSAI1M = 1;
-  PeriphClkInit.PLLSAI1.PLLSAI1N = 24;
+  PeriphClkInit.PLLSAI1.PLLSAI1N = 16;
   PeriphClkInit.PLLSAI1.PLLSAI1P = RCC_PLLP_DIV7;
   PeriphClkInit.PLLSAI1.PLLSAI1Q = RCC_PLLQ_DIV2;
   PeriphClkInit.PLLSAI1.PLLSAI1R = RCC_PLLR_DIV2;
