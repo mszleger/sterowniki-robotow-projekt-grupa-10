@@ -19,6 +19,7 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+#include "dfsdm.h"
 #include "i2c.h"
 #include "lcd.h"
 #include "quadspi.h"
@@ -105,14 +106,14 @@ int main(void)
   MX_SAI1_Init();
   MX_USART2_UART_Init();
   MX_LCD_Init();
+  MX_DFSDM1_Init();
   /* USER CODE BEGIN 2 */
   // Wyświetlanie litery 'A'
   //LCD_A_1();
   //LCD_E_2();
-  printf("\n\n\n\r");
-  flash_print_info();
-  flash_write_enable();
-  flash_print_status_register();
+
+  //flash_test_read_write();
+  QSPI_demo();
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -208,10 +209,12 @@ void SystemClock_Config(void)
     Error_Handler();
   }
   PeriphClkInit.PeriphClockSelection = RCC_PERIPHCLK_RTC|RCC_PERIPHCLK_USART2
-                              |RCC_PERIPHCLK_SAI1|RCC_PERIPHCLK_I2C1;
+                              |RCC_PERIPHCLK_SAI1|RCC_PERIPHCLK_I2C1
+                              |RCC_PERIPHCLK_DFSDM1;
   PeriphClkInit.Usart2ClockSelection = RCC_USART2CLKSOURCE_PCLK1;
   PeriphClkInit.I2c1ClockSelection = RCC_I2C1CLKSOURCE_PCLK1;
   PeriphClkInit.Sai1ClockSelection = RCC_SAI1CLKSOURCE_PLLSAI1;
+  PeriphClkInit.Dfsdm1ClockSelection = RCC_DFSDM1CLKSOURCE_PCLK;
   PeriphClkInit.RTCClockSelection = RCC_RTCCLKSOURCE_LSI;
   PeriphClkInit.PLLSAI1.PLLSAI1Source = RCC_PLLSOURCE_MSI;
   PeriphClkInit.PLLSAI1.PLLSAI1M = 1;
