@@ -1,61 +1,8 @@
 #include "flash.h"
 
-/**
-  ******************************************************************************
-  * @file    BSP/Src/qspi.c
-  * @author  MCD Application Team
-  * @brief   This example code shows how to use the QSPI flash in the
-  *          STM32L476G-Discovery driver
-  ******************************************************************************
-  * @attention
-  *
-  * <h2><center>&copy; Copyright (c) 2017 STMicroelectronics.
-  * All rights reserved.</center></h2>
-  *
-  * This software component is licensed by ST under BSD 3-Clause license,
-  * the "License"; You may not use this file except in compliance with the
-  * License. You may obtain a copy of the License at:
-  *                        opensource.org/licenses/BSD-3-Clause
-  *
-  ******************************************************************************
-  */
-
-/* Includes ------------------------------------------------------------------*/
-
-
-/** @addtogroup STM32L4xx_HAL_Examples
-  * @{
-  */
-
-/** @addtogroup BSP
-  * @{
-  */
-
-/* Private typedef -----------------------------------------------------------*/
-/* Private define ------------------------------------------------------------*/
-#define BUFFER_SIZE         ((uint32_t)0x0200)
-#define WRITE_READ_ADDR     ((uint32_t)0x0050)
-#define QSPI_BASE_ADDR      ((uint32_t)0x90000000)
-
-/* Private macro -------------------------------------------------------------*/
-/* Private variables ---------------------------------------------------------*/
-uint8_t qspi_aTxBuffer[BUFFER_SIZE];
-uint8_t qspi_aRxBuffer[BUFFER_SIZE];
-
-/* External variables --------------------------------------------------------*/
-extern __IO FlagStatus KeyPressed;
-
-/* Private function prototypes -----------------------------------------------*/
 static void     Fill_Buffer (uint8_t *pBuffer, uint32_t uwBufferLength, uint32_t uwOffset);
 static uint8_t  Buffercmp   (uint8_t* pBuffer1, uint8_t* pBuffer2, uint32_t BufferLength);
 
-/* Private functions ---------------------------------------------------------*/
-
-/**
-  * @brief  QSPI Demo
-  * @param  None
-  * @retval None
-  */
 void QSPI_demo (void)
 {
   /* QSPI info structure */
@@ -63,7 +10,6 @@ void QSPI_demo (void)
   uint8_t status;
   __IO uint8_t *data_ptr;
   uint32_t index;
-  Led_TypeDef led = LED_RED;
 
   /*##-1- Configure the QSPI device ##########################################*/
   /* QSPI device configuration */
@@ -147,7 +93,6 @@ void QSPI_demo (void)
                 if(index == BUFFER_SIZE)
                 {
                 	printf("QSPI Test OK.\r\n");
-                    led = LED_GREEN;
                 }
               }
             }
@@ -157,20 +102,8 @@ void QSPI_demo (void)
     }
   }
 
-  while (1)
-  {
-    BSP_LED_Toggle(led);
-    HAL_Delay(100);
-  }
 }
 
-/**
-  * @brief  Fills buffer with user predefined data.
-  * @param  pBuffer: pointer on the buffer to fill
-  * @param  uwBufferLenght: size of the buffer to fill
-  * @param  uwOffset: first value to fill on the buffer
-  * @retval None
-  */
 static void Fill_Buffer(uint8_t *pBuffer, uint32_t uwBufferLenght, uint32_t uwOffset)
 {
   uint32_t tmpIndex = 0;
@@ -182,13 +115,6 @@ static void Fill_Buffer(uint8_t *pBuffer, uint32_t uwBufferLenght, uint32_t uwOf
   }
 }
 
-/**
-  * @brief  Compares two buffers.
-  * @param  pBuffer1, pBuffer2: buffers to be compared.
-  * @param  BufferLength: buffer's length
-  * @retval 1: pBuffer identical to pBuffer1
-  *         0: pBuffer differs from pBuffer1
-  */
 static uint8_t Buffercmp(uint8_t* pBuffer1, uint8_t* pBuffer2, uint32_t BufferLength)
 {
   while (BufferLength--)
@@ -205,12 +131,106 @@ static uint8_t Buffercmp(uint8_t* pBuffer1, uint8_t* pBuffer2, uint32_t BufferLe
   return 0;
 }
 
-/**
-  * @}
-  */
 
-/**
-  * @}
-  */
 
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+HAL_StatusTypeDef Flash_Init(void) {
+	while(1);
+}
+
+HAL_StatusTypeDef Flash_Test(void) {
+	while(1);
+}
+
+HAL_StatusTypeDef Flash_Read(uint32_t start_address, uint8_t* buffer, uint32_t buffer_length) {
+	while(1);
+}
+
+HAL_StatusTypeDef Flash_Write(uint32_t start_address, uint8_t* buffer, uint32_t buffer_length) {
+	while(1);
+}
+
+HAL_StatusTypeDef Flash_Track_Status_Set(uint8_t track_number, uint8_t new_track_status) {
+	while(1);
+}
+
+HAL_StatusTypeDef Flash_Track_Status_Get(uint8_t track_number, uint8_t* track_status) {
+	while(1);
+}
+
+HAL_StatusTypeDef Flash_Record_Start(uint8_t track_number) {
+	while(1);
+}
+
+HAL_StatusTypeDef Flash_Record_Save_Buffer(uint8_t* buffer, uint32_t buffer_length) {
+	while(1);
+}
+
+HAL_StatusTypeDef Flash_Play_Start(uint8_t track_number) {
+	while(1);
+}
+
+HAL_StatusTypeDef Flash_Play_Read_Buffer(uint8_t* buffer, uint32_t buffer_length) {
+	while(1);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
