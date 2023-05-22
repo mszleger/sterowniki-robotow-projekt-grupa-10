@@ -82,7 +82,6 @@ int main(void)
   /* MCU Configuration--------------------------------------------------------*/
 
   /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
-  HAL_Init();
 
   /* USER CODE BEGIN Init */
 
@@ -109,7 +108,19 @@ int main(void)
   //LCD_E_2();
 
   //flash_test_read_write();
-  QSPI_demo();
+
+  printf("Start\r\n");
+  if(Flash_Init() != HAL_OK) {
+	  printf("Flash init error\r\n");
+	  while(1);
+  }
+  if(Flash_Test() != HAL_OK) {
+	  printf("Flash test error\r\n");
+	  while(1);
+  }
+
+  printf("Flash test OK\r\n");
+
   /* USER CODE END 2 */
 
   /* Infinite loop */

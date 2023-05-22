@@ -1,5 +1,10 @@
 #pragma once
 
+// ----- SETTINGS ----- //
+#define TRACK_AMOUNT            5
+#define TRACK_SPACE_LENGTH      ((uint32_t)0x0200)
+#define USER_DATA_BEGIN_ADDRESS ((uint32_t)0x0050)
+
 // Flash chip: N25Q128A13EF840E
 
 #include "stdio.h"
@@ -7,22 +12,15 @@
 #include "stm32l476g_discovery.h"
 #include "stm32l476g_discovery_qspi.h"
 
+QSPI_Info flash_info;
+uint32_t track_status_address[TRACK_AMOUNT];
+uint32_t track_begin_address[TRACK_AMOUNT];
 
+uint32_t record_address;
+uint32_t record_end_address; // start address of next track
 
-#define BUFFER_SIZE         ((uint32_t)0x0200)
-#define WRITE_READ_ADDR     ((uint32_t)0x0050)
-#define QSPI_BASE_ADDR      ((uint32_t)0x90000000)
-
-uint8_t qspi_aTxBuffer[BUFFER_SIZE];
-uint8_t qspi_aRxBuffer[BUFFER_SIZE];
-
-
-
-
-
-void QSPI_demo(void);
-
-
+uint32_t play_address;
+uint32_t play_end_address; // start address of next track
 
 /**
  *
@@ -32,17 +30,13 @@ HAL_StatusTypeDef Flash_Init(void);
 /**
  *
  */
+HAL_StatusTypeDef Flash_Init_Tracks_Layout(void);
+
+/**
+ *
+ */
 HAL_StatusTypeDef Flash_Test(void);
 
-/**
- *
- */
-HAL_StatusTypeDef Flash_Read(uint32_t start_address, uint8_t* buffer, uint32_t buffer_length);
-
-/**
- *
- */
-HAL_StatusTypeDef Flash_Write(uint32_t start_address, uint8_t* buffer, uint32_t buffer_length);
 
 
 /**
@@ -63,7 +57,7 @@ HAL_StatusTypeDef Flash_Record_Start(uint8_t track_number);
 /**
  *
  */
-HAL_StatusTypeDef Flash_Record_Save_Buffer(uint8_t* buffer, uint32_t buffer_length);
+uint32_t Flash_Record_Save_Buffer(uint8_t* buffer, uint32_t buffer_length);
 
 /**
  *
@@ -73,7 +67,7 @@ HAL_StatusTypeDef Flash_Play_Start(uint8_t track_number);
 /**
  *
  */
-HAL_StatusTypeDef Flash_Play_Read_Buffer(uint8_t* buffer, uint32_t buffer_length);
+uint32_t Flash_Play_Read_Buffer(uint8_t* buffer, uint32_t buffer_length);
 
 
 

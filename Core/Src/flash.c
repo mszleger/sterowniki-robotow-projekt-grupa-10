@@ -1,191 +1,162 @@
 #include "flash.h"
 
-static void     Fill_Buffer (uint8_t *pBuffer, uint32_t uwBufferLength, uint32_t uwOffset);
-static uint8_t  Buffercmp   (uint8_t* pBuffer1, uint8_t* pBuffer2, uint32_t BufferLength);
-
-void QSPI_demo (void)
-{
-  /* QSPI info structure */
-  static QSPI_Info pQSPI_Info;
-  uint8_t status;
-  __IO uint8_t *data_ptr;
-  uint32_t index;
-
-  /*##-1- Configure the QSPI device ##########################################*/
-  /* QSPI device configuration */
-  status = BSP_QSPI_Init();
-
-  if (status != QSPI_OK)
-  {
-    printf("QSPI Initialization : FAILED.\n\r");
-  }
-  else
-  {
-    /*##-2- Read & check the QSPI info #######################################*/
-    /* Initialize the structure */
-    pQSPI_Info.FlashSize          = (uint32_t)0x00;
-    pQSPI_Info.EraseSectorSize    = (uint32_t)0x00;
-    pQSPI_Info.EraseSectorsNumber = (uint32_t)0x00;
-    pQSPI_Info.ProgPageSize       = (uint32_t)0x00;
-    pQSPI_Info.ProgPagesNumber    = (uint32_t)0x00;
-
-    /* Read the QSPI memory info */
-    BSP_QSPI_GetInfo(&pQSPI_Info);
-
-    /* Test the correctness */
-    if((pQSPI_Info.FlashSize != 0x1000000) || (pQSPI_Info.EraseSectorSize != 0x1000)  ||
-       (pQSPI_Info.ProgPageSize != 0x100)  || (pQSPI_Info.EraseSectorsNumber != 4096) ||
-       (pQSPI_Info.ProgPagesNumber != 65536))
-    {
-      printf("QSPI GET INFO : FAILED.\n\r");
-    }
-    else
-    {
-      /*##-3- Erase QSPI memory ################################################*/
-      if(BSP_QSPI_Erase_Block(WRITE_READ_ADDR) != QSPI_OK)
-      {
-        printf("QSPI ERASE : FAILED.\n\r");
-      }
-      else
-      {
-        /*##-4- QSPI memory read/write access  ###############################*/
-        /* Fill the buffer to write */
-        Fill_Buffer(qspi_aTxBuffer, BUFFER_SIZE, 0xD20F);
-
-        /* Write data to the QSPI memory */
-        if(BSP_QSPI_Write(qspi_aTxBuffer, WRITE_READ_ADDR, BUFFER_SIZE) != QSPI_OK)
-        {
-          printf("QSPI WRITE : FAILED.\n\r");
-        }
-        else
-        {
-          /* Read back data from the QSPI memory */
-          if(BSP_QSPI_Read(qspi_aRxBuffer, WRITE_READ_ADDR, BUFFER_SIZE) != QSPI_OK)
-          {
-            printf("QSPI READ : FAILED.\n\r");
-          }
-          else
-          {
-            /*##-5- Checking data integrity ##################################*/
-            if(Buffercmp(qspi_aRxBuffer, qspi_aTxBuffer, BUFFER_SIZE) > 0)
-            {
-              printf("QSPI COMPARE : FAILED\n\r");
-            }
-            else
-            {
-              /*##-6- QSPI memory in memory-mapped mode#######################*/
-              if(BSP_QSPI_EnableMemoryMappedMode() != QSPI_OK)
-              {
-            	  printf("QSPI MEMORY-MAPPED CFG : FAILED.\n\r");
-              }
-              else
-              {
-                for(index = 0, data_ptr = (__IO uint8_t *)(QSPI_BASE_ADDR + WRITE_READ_ADDR);
-                    index < BUFFER_SIZE; index++, data_ptr++)
-                {
-                  if(*data_ptr != qspi_aTxBuffer[index])
-                  {
-                	  printf("QSPI MEMORY-MAPPED ACCESS : FAILED.\n\r");
-                    break;
-                  }
-                }
-
-                if(index == BUFFER_SIZE)
-                {
-                	printf("QSPI Test OK.\r\n");
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-
-}
-
-static void Fill_Buffer(uint8_t *pBuffer, uint32_t uwBufferLenght, uint32_t uwOffset)
-{
-  uint32_t tmpIndex = 0;
-
-  /* Put in global buffer different values */
-  for (tmpIndex = 0; tmpIndex < uwBufferLenght; tmpIndex++ )
-  {
-    pBuffer[tmpIndex] = tmpIndex + uwOffset;
-  }
-}
-
-static uint8_t Buffercmp(uint8_t* pBuffer1, uint8_t* pBuffer2, uint32_t BufferLength)
-{
-  while (BufferLength--)
-  {
-    if (*pBuffer1 != *pBuffer2)
-    {
-      return 1;
-    }
-
-    pBuffer1++;
-    pBuffer2++;
-  }
-
-  return 0;
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 HAL_StatusTypeDef Flash_Init(void) {
-	while(1);
+	HAL_StatusTypeDef status;
+
+	status = BSP_QSPI_Init();
+	if(status != HAL_OK) return status;
+
+    flash_info.FlashSize          = (uint32_t)0x00;
+    flash_info.EraseSectorSize    = (uint32_t)0x00;
+    flash_info.EraseSectorsNumber = (uint32_t)0x00;
+    flash_info.ProgPageSize       = (uint32_t)0x00;
+    flash_info.ProgPagesNumber    = (uint32_t)0x00;
+
+    BSP_QSPI_GetInfo(&flash_info);
+
+    if((flash_info.FlashSize != 0x1000000)     ||
+       (flash_info.EraseSectorSize != 0x1000)  ||
+       (flash_info.ProgPageSize != 0x100)      ||
+	   (flash_info.EraseSectorsNumber != 4096) ||
+       (flash_info.ProgPagesNumber != 65536))
+    	return HAL_ERROR;
+
+    status = Flash_Init_Tracks_Layout();
+    if(status != HAL_OK) return status;
+
+    return HAL_OK;
+}
+
+HAL_StatusTypeDef Flash_Init_Tracks_Layout(void) {
+	if(USER_DATA_BEGIN_ADDRESS + TRACK_AMOUNT + (TRACK_AMOUNT * TRACK_SPACE_LENGTH) > flash_info.FlashSize)
+		return HAL_ERROR;
+
+	for(uint32_t i = 0; i < TRACK_AMOUNT; ++i)
+		track_status_address[i] = USER_DATA_BEGIN_ADDRESS + i;
+
+	for(uint32_t i = 0; i < TRACK_AMOUNT; ++i)
+		track_begin_address[i] = USER_DATA_BEGIN_ADDRESS + TRACK_AMOUNT + (i * TRACK_SPACE_LENGTH);
+
+	return HAL_OK;
 }
 
 HAL_StatusTypeDef Flash_Test(void) {
-	while(1);
-}
+	uint32_t buffer_tx_size = 256;
+	uint32_t buffer_rx_size = 100;
 
-HAL_StatusTypeDef Flash_Read(uint32_t start_address, uint8_t* buffer, uint32_t buffer_length) {
-	while(1);
-}
+	HAL_StatusTypeDef status;
+	uint8_t buffer_tx[buffer_tx_size];
+	uint8_t buffer_rx[buffer_rx_size];
+	uint32_t bytes_tested = 0;
 
-HAL_StatusTypeDef Flash_Write(uint32_t start_address, uint8_t* buffer, uint32_t buffer_length) {
-	while(1);
+	// Filling tx buffer
+	for(uint32_t i = 0; i < buffer_tx_size; ++i)
+		buffer_tx[i] = i % 256;
+
+	// Testing all records RW space
+	for(uint8_t track = 0; track < TRACK_AMOUNT; ++track) {
+		// Testing track status register
+		uint8_t status_register_value = 0;
+		status = Flash_Track_Status_Set(track, 150);
+		if(status != HAL_OK) return status;
+		status = Flash_Track_Status_Get(track, &status_register_value);
+		if(status != HAL_OK) return status;
+		if(status_register_value != 150) return HAL_ERROR;
+
+		status = Flash_Track_Status_Set(track, 10);
+		if(status != HAL_OK) return status;
+		status = Flash_Track_Status_Get(track, &status_register_value);
+		if(status != HAL_OK) return status;
+		if(status_register_value != 10) return HAL_ERROR;
+
+		// Start of recording
+		status = Flash_Record_Start(track);
+		if(status != HAL_OK) return status;
+		// Recording
+		while(Flash_Record_Save_Buffer(buffer_tx, buffer_tx_size) != buffer_tx_size);
+		// Start of playing
+		status = Flash_Play_Start(track);
+		if(status != HAL_OK) return status;
+		// Playing and values checking
+		uint8_t expected_value = 0;
+		uint32_t bytes_read = 0;
+		do {
+			bytes_read = Flash_Record_Save_Buffer(buffer_rx, buffer_rx_size);
+			for(uint8_t i = 0; i < bytes_read; ++i) {
+				if(buffer_rx[i] != expected_value) return HAL_ERROR;
+				expected_value += 1;
+				expected_value %= 256;
+				bytes_tested += 1;
+			}
+		} while(bytes_read != buffer_rx_size);
+	}
+
+	printf("FLASH: Tested %ld bytes\r\n", bytes_tested);
+	return HAL_OK;
 }
 
 HAL_StatusTypeDef Flash_Track_Status_Set(uint8_t track_number, uint8_t new_track_status) {
-	while(1);
+	HAL_StatusTypeDef status;
+
+	if(track_number >= TRACK_AMOUNT) return HAL_ERROR;
+
+	status = BSP_QSPI_Write(&new_track_status, track_status_address[track_number], 1);
+	if(status != HAL_OK) return status;
+
+	return HAL_OK;
 }
 
 HAL_StatusTypeDef Flash_Track_Status_Get(uint8_t track_number, uint8_t* track_status) {
-	while(1);
+	HAL_StatusTypeDef status;
+
+	if(track_number >= TRACK_AMOUNT) return HAL_ERROR;
+
+	status = BSP_QSPI_Read(track_status, track_status_address[track_number], 1);
+	if(status != HAL_OK) return status;
+
+	return HAL_OK;
 }
 
 HAL_StatusTypeDef Flash_Record_Start(uint8_t track_number) {
-	while(1);
+	if(track_number >= TRACK_AMOUNT) return HAL_ERROR;
+
+	record_address = track_begin_address[track_number];
+	record_end_address = track_begin_address[track_number] + TRACK_SPACE_LENGTH;
+
+	return HAL_OK;
 }
 
-HAL_StatusTypeDef Flash_Record_Save_Buffer(uint8_t* buffer, uint32_t buffer_length) {
-	while(1);
+uint32_t Flash_Record_Save_Buffer(uint8_t* buffer, uint32_t buffer_length) {
+	if(buffer_length > record_end_address - record_address)
+		buffer_length = record_end_address - record_address;
+
+	if(BSP_QSPI_Write(buffer, record_address, buffer_length) != HAL_OK)
+		return 0;
+
+	record_address += buffer_length;
+
+	return buffer_length;
 }
 
 HAL_StatusTypeDef Flash_Play_Start(uint8_t track_number) {
-	while(1);
+	if(track_number >= TRACK_AMOUNT) return HAL_ERROR;
+
+	play_address = track_begin_address[track_number];
+	play_end_address = track_begin_address[track_number] + TRACK_SPACE_LENGTH;
+
+	return HAL_OK;
 }
 
-HAL_StatusTypeDef Flash_Play_Read_Buffer(uint8_t* buffer, uint32_t buffer_length) {
-	while(1);
+uint32_t Flash_Play_Read_Buffer(uint8_t* buffer, uint32_t buffer_length) {
+	if(buffer_length > play_end_address - play_address)
+		buffer_length = play_end_address - play_address;
+
+	if(BSP_QSPI_Read(buffer, play_address, buffer_length) != HAL_OK)
+		return 0;
+
+	play_address += buffer_length;
+
+	return buffer_length;
 }
 
 
