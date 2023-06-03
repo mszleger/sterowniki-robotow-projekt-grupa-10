@@ -31,6 +31,7 @@
 /* USER CODE BEGIN Includes */
 #include <stdio.h>
 #include "flash.h"
+#include "dac.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
