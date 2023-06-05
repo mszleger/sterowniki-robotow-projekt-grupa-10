@@ -25,7 +25,7 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
-#include "stm32l476g_discovery_glass_lcd.h"
+
 /* USER CODE BEGIN Includes */
 #include <stdio.h>
 #include <string.h>
@@ -33,16 +33,8 @@
 /* USER CODE END Includes */
 
 extern LCD_HandleTypeDef hlcd;
-extern char* new_str;
-
-extern uint32_t RAM0;
-extern uint32_t RAM1;
-extern uint32_t RAM2;
-extern uint32_t RAM3;
-extern uint32_t RAM4;
-extern uint32_t RAM5;
-extern uint32_t RAM6;
-extern uint32_t RAM7;
+extern char *str;
+extern char *new_str;
 /* USER CODE BEGIN Private defines */
 
 /* USER CODE END Private defines */

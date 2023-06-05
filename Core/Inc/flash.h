@@ -16,6 +16,9 @@
 #define TRACK_STATUS_SUBSECTOR 1
 #define SUBSECTOR_SIZE      4096
 
+#define TRACK_EMPTY 0
+#define TRACK_SAVED 1
+
 QSPI_Info flash_info;
 
 uint32_t track_status_page_start_address;

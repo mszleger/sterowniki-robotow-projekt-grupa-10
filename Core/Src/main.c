@@ -32,6 +32,7 @@
 #include <stdio.h>
 #include "flash.h"
 #include "dac.h"
+#include "joy.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -41,6 +42,27 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
+#define MAIN_MENU                   0
+#define OPTION_RECORD 0
+#define OPTION_PLAY   1
+#define OPTION_DELETE 2
+#define OPTION_AUTO   3
+
+#define SUBMENU_RECORD_TRACK_SELECT 1
+
+#define SUBMENU_PLAY_TRACK_SELECT   2
+
+#define SUBMENU_DELETE_TRACK_SELECT 3
+
+#define SUBMENU_AUTO_SWITCH         4
+
+#define STATE_RECORGING             5
+#define STATE_PLAYING               6
+#define STATE_DELETING              7
+#define STATE_SWITCHING             8
+
+#define AUTO_DISABLED               0
+#define AUTO_ENABLED                1
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -51,7 +73,13 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
-
+static uint8_t menu_structure[9][2] = {{0,3},{0,7},{0,7},{0,7},{0,1}};
+static char* menu_text[9][8] = {{"RECORD", "PLAY", "DELETE", "AUTO"},
+		                        {"TRACK1", "TRACK2", "TRACK3", "TRACK4", "TRACK5", "TRACK6", "TRACK7", "TRACK8"},
+		                        {"TRACK1", "TRACK2", "TRACK3", "TRACK4", "TRACK5", "TRACK6", "TRACK7", "TRACK8"},
+							    {"TRACK1", "TRACK2", "TRACK3", "TRACK4", "TRACK5", "TRACK6", "TRACK7", "TRACK8"},
+							    {"OFF", "ON"}};
+volatile uint8_t auto_status = 0;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -63,11 +91,73 @@ void SystemClock_Config(void);
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 // Adding support of printf function - sending data over USART
-
 int _write(int file, char *ptr, int len) {
   HAL_UART_Transmit(&huart2, ptr, len, 50);
   return len;
 }
+void update_menu(uint8_t submenu, uint8_t option) {
+	display_lcd(menu_text[submenu][option]);
+}
+void update_joystick(struct joy* joystick, uint8_t* submenu, uint8_t* option) {
+	static uint32_t joystick_event_id = 0;
+	joy_up(joystick);
+	joy_down(joystick);
+	joy_left(joystick);
+	joy_right(joystick);
+	joy_center(joystick);
+	if(joystick->tab[joystick_event_id] == -1) return; // NO NEW EVENT
+	switch(joystick->tab[joystick_event_id]) {
+		case 0: // UP - previous option
+			if(menu_structure[*submenu][0] < *option) // Check if can go up
+				--(*option);
+			break;
+		case 2: // DOWN - next option
+			if(menu_structure[*submenu][1] > *option) // Check if can go up
+				++(*option);
+			break;
+		case 1: // RIGHT - enter option
+		case 4: // CENTER
+			if(*submenu == MAIN_MENU) {
+				*submenu = *option + 1;
+				*option  = 0;
+			} else {
+				*submenu = *submenu + 4; // Go from selecting to state
+			}
+			break;
+		case 3: // LEFT - go to previous submenu
+			if(*submenu == SUBMENU_RECORD_TRACK_SELECT || *submenu == SUBMENU_PLAY_TRACK_SELECT ||
+			   *submenu == SUBMENU_DELETE_TRACK_SELECT || *submenu == SUBMENU_AUTO_SWITCH) {
+				*option  = *submenu - 1;
+				*submenu = MAIN_MENU;
+			}
+			break;
+		default:
+			printf("Unknown key id: %d", joystick->tab[joystick_event_id]);
+			break;
+	}
+	++joystick_event_id;
+}
+void record_track(uint8_t track_id) {
+	//TODO
+	HAL_Delay(1000);
+}
+void play_track(uint8_t track_id) {
+	//TODO
+	HAL_Delay(1000);
+}
+void delete_track(uint8_t track_id) {
+	Flash_Track_Status_Set(track_id, TRACK_EMPTY);
+	HAL_Delay(1000);
+}
+void switch_auto(uint8_t state) {
+	auto_status = state;
+	HAL_Delay(1000);
+}
+uint8_t is_there_conversation() {
+	//TODO
+	return 0;
+}
+
 /* USER CODE END 0 */
 
 /**
@@ -83,6 +173,7 @@ int main(void)
   /* MCU Configuration--------------------------------------------------------*/
 
   /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
+  HAL_Init();
 
   /* USER CODE BEGIN Init */
 
@@ -104,23 +195,20 @@ int main(void)
   MX_LCD_Init();
   MX_DFSDM1_Init();
   /* USER CODE BEGIN 2 */
-  // Wyświetlanie litery 'A'
-  //LCD_A_1();
-  //LCD_E_2();
-
-  //flash_test_read_write();
-
-  printf("Start\r\n");
   if(Flash_Init() != HAL_OK) {
 	  printf("Flash init error\r\n");
 	  while(1);
   }
-  if(Flash_Test() != HAL_OK) {
-	  printf("Flash test error\r\n");
-	  while(1);
-  }
 
-  printf("Flash test OK\r\n");
+  lcd_init();
+
+  struct joy joystick;
+  joy_init(&joystick);
+
+  uint8_t submenu = 0;
+  uint8_t option  = 0;
+  uint8_t state = 0;
+  uint8_t state_old = 255;
 
   /* USER CODE END 2 */
 
@@ -128,9 +216,48 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-	display_lcd("michal");
-
-
+	// Joystick
+	update_joystick(&joystick, &submenu, &option);
+	// States handlers
+    if(submenu == STATE_RECORGING) {
+    	display_lcd("REC");
+    	record_track(option);
+    	submenu = MAIN_MENU;
+    	option = 0;
+    }
+    if(submenu == STATE_PLAYING) {
+    	display_lcd("PLAYIN");
+    	play_track(option);
+    	submenu = MAIN_MENU;
+    	option = 0;
+    }
+    if(submenu == STATE_DELETING) {
+    	display_lcd("DEL");
+    	delete_track(option);
+    	submenu = MAIN_MENU;
+    	option = 0;
+    }
+    if(submenu == STATE_SWITCHING) {
+    	display_lcd("SWITCH");
+    	switch_auto(state);
+    	submenu = MAIN_MENU;
+    	option = 0;
+    }
+    // Conversation detector
+    if(auto_status == AUTO_ENABLED) {
+    	if(is_there_conversation()) {
+        	display_lcd("REC");
+        	record_track(0);
+        	submenu = MAIN_MENU;
+        	option = 0;
+    	}
+    }
+	// LCD Update
+	state = (10 * submenu) + option;
+	if(state != state_old) {
+		update_menu(submenu, option);
+		state_old = state;
+	}
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
@@ -148,22 +275,14 @@ void SystemClock_Config(void)
   RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
   RCC_PeriphCLKInitTypeDef PeriphClkInit = {0};
 
-  /** Configure LSE Drive Capability
-  */
-  HAL_PWR_EnableBkUpAccess();
-  __HAL_RCC_LSEDRIVE_CONFIG(RCC_LSEDRIVE_LOW);
   /** Initializes the RCC Oscillators according to the specified parameters
   * in the RCC_OscInitTypeDef structure.
   */
-  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_LSI|RCC_OSCILLATORTYPE_LSE
-                              |RCC_OSCILLATORTYPE_MSI;
-  RCC_OscInitStruct.LSEState = RCC_LSE_ON;
+  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_LSI|RCC_OSCILLATORTYPE_HSE;
+  RCC_OscInitStruct.HSEState = RCC_HSE_ON;
   RCC_OscInitStruct.LSIState = RCC_LSI_ON;
-  RCC_OscInitStruct.MSIState = RCC_MSI_ON;
-  RCC_OscInitStruct.MSICalibrationValue = 0;
-  RCC_OscInitStruct.MSIClockRange = RCC_MSIRANGE_6;
   RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
-  RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_MSI;
+  RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSE;
   RCC_OscInitStruct.PLL.PLLM = 1;
   RCC_OscInitStruct.PLL.PLLN = 20;
   RCC_OscInitStruct.PLL.PLLP = RCC_PLLP_DIV7;
@@ -178,11 +297,11 @@ void SystemClock_Config(void)
   RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK|RCC_CLOCKTYPE_SYSCLK
                               |RCC_CLOCKTYPE_PCLK1|RCC_CLOCKTYPE_PCLK2;
   RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
-  RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV2;
+  RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
   RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV1;
   RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
 
-  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_1) != HAL_OK)
+  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_4) != HAL_OK)
   {
     Error_Handler();
   }
@@ -194,7 +313,7 @@ void SystemClock_Config(void)
   PeriphClkInit.Sai1ClockSelection = RCC_SAI1CLKSOURCE_PLLSAI1;
   PeriphClkInit.Dfsdm1ClockSelection = RCC_DFSDM1CLKSOURCE_PCLK;
   PeriphClkInit.RTCClockSelection = RCC_RTCCLKSOURCE_LSI;
-  PeriphClkInit.PLLSAI1.PLLSAI1Source = RCC_PLLSOURCE_MSI;
+  PeriphClkInit.PLLSAI1.PLLSAI1Source = RCC_PLLSOURCE_HSE;
   PeriphClkInit.PLLSAI1.PLLSAI1M = 1;
   PeriphClkInit.PLLSAI1.PLLSAI1N = 24;
   PeriphClkInit.PLLSAI1.PLLSAI1P = RCC_PLLP_DIV7;
@@ -211,9 +330,6 @@ void SystemClock_Config(void)
   {
     Error_Handler();
   }
-  /** Enable MSI Auto calibration
-  */
-  HAL_RCCEx_EnableMSIPLLMode();
 }
 
 /* USER CODE BEGIN 4 */

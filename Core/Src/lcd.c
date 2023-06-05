@@ -25,62 +25,30 @@
 /* USER CODE END 0 */
 
 LCD_HandleTypeDef hlcd;
- uint32_t RAM0;
- uint32_t RAM1;
- uint32_t RAM2;
- uint32_t RAM3;
- uint32_t RAM4;
- uint32_t RAM5;
- uint32_t RAM6;
- uint32_t RAM7;
-char* new_str;
+ char *str;
+ char *new_str;
 /* LCD init function */
 void MX_LCD_Init(void)
 {
 
   hlcd.Instance = LCD;
   hlcd.Init.Prescaler = LCD_PRESCALER_1;
-  hlcd.Init.Divider = LCD_DIVIDER_31;
+  hlcd.Init.Divider = LCD_DIVIDER_16;
   hlcd.Init.Duty = LCD_DUTY_1_4;
-  hlcd.Init.Bias = LCD_BIAS_1_3;
+  hlcd.Init.Bias = LCD_BIAS_1_4;
   hlcd.Init.VoltageSource = LCD_VOLTAGESOURCE_INTERNAL;
-  hlcd.Init.Contrast = LCD_CONTRASTLEVEL_5;
+  hlcd.Init.Contrast = LCD_CONTRASTLEVEL_0;
   hlcd.Init.DeadTime = LCD_DEADTIME_0;
-  hlcd.Init.PulseOnDuration = LCD_PULSEONDURATION_4;
-  hlcd.Init.MuxSegment = LCD_MUXSEGMENT_DISABLE;
+  hlcd.Init.PulseOnDuration = LCD_PULSEONDURATION_0;
+  hlcd.Init.MuxSegment = LCD_MUXSEGMENT_ENABLE;
   hlcd.Init.BlinkMode = LCD_BLINKMODE_OFF;
-  hlcd.Init.BlinkFrequency = LCD_BLINKFREQUENCY_DIV32;
+  hlcd.Init.BlinkFrequency = LCD_BLINKFREQUENCY_DIV8;
   hlcd.Init.HighDrive = LCD_HIGHDRIVE_DISABLE;
-  HAL_LCD_MspInit(&hlcd);
   if (HAL_LCD_Init(&hlcd) != HAL_OK)
   {
     Error_Handler();
   }
 
-
-//  LCDHandle.Instance              = LCD;
-//  LCDHandle.Init.Prescaler        = LCD_PRESCALER_1;
-//  LCDHandle.Init.Divider          = LCD_DIVIDER_31;
-//#if defined (USE_STM32L476G_DISCO_REVC) || defined (USE_STM32L476G_DISCO_REVB)
-//  LCDHandle.Init.Duty             = LCD_DUTY_1_4;
-//#elif defined (USE_STM32L476G_DISCO_REVA)
-//  LCDHandle.Init.Duty             = LCD_DUTY_1_8;
-//#endif
-//  LCDHandle.Init.Bias             = LCD_BIAS_1_3;
-//  LCDHandle.Init.VoltageSource    = LCD_VOLTAGESOURCE_INTERNAL;
-//  LCDHandle.Init.Contrast         = LCD_CONTRASTLEVEL_5;
-//  LCDHandle.Init.DeadTime         = LCD_DEADTIME_0;
-//  LCDHandle.Init.PulseOnDuration  = LCD_PULSEONDURATION_4;
-//  LCDHandle.Init.HighDrive        = LCD_HIGHDRIVE_DISABLE;
-//  LCDHandle.Init.BlinkMode        = LCD_BLINKMODE_OFF;
-//  LCDHandle.Init.BlinkFrequency   = LCD_BLINKFREQUENCY_DIV32;
-//  LCDHandle.Init.MuxSegment       = LCD_MUXSEGMENT_DISABLE;
-//
-//  /* Initialize the LCD */
-//  LCD_MspInit(&LCDHandle);
-//  HAL_LCD_Init(&LCDHandle);
-//
-//  BSP_LCD_GLASS_Clear();
 }
 
 void HAL_LCD_MspInit(LCD_HandleTypeDef* lcdHandle)
