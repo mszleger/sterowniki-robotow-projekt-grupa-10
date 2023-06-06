@@ -216,7 +216,7 @@ int main(void)
   MX_QUADSPI_Init();
   MX_SAI1_Init();
   MX_USART2_UART_Init();
-  MX_LCD_Init();
+  //MX_LCD_Init();
   MX_DFSDM1_Init();
   /* USER CODE BEGIN 2 */
   if(Flash_Init() != HAL_OK) {
