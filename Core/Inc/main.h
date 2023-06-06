@@ -90,10 +90,6 @@ void Error_Handler(void);
 #define LCD_SEG_21_GPIO_Port GPIOB
 #define LCD_SEG_2_Pin GPIO_PIN_1
 #define LCD_SEG_2_GPIO_Port GPIOB
-#define MIC_AUDIO_DIN_Pin GPIO_PIN_7
-#define MIC_AUDIO_DIN_GPIO_Port GPIOE
-#define MIC_AUDIO_CLK_Pin GPIO_PIN_9
-#define MIC_AUDIO_CLK_GPIO_Port GPIOE
 #define QSPI_CLK_Pin GPIO_PIN_10
 #define QSPI_CLK_GPIO_Port GPIOE
 #define QSPI_CS_Pin GPIO_PIN_11

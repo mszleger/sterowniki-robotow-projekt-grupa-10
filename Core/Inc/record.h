@@ -7,6 +7,8 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "main.h"
+#include "dfsdm.h"
+#include "lcd.h"
 #include "stm32l476g_discovery_audio.h"
 /* USER CODE END Includes */
 
@@ -17,32 +19,20 @@
 
 /* Exported constants --------------------------------------------------------*/
 /* USER CODE BEGIN EC */
-#define BUFF_SIZE (uint32_t)2048
-#define SAMPLES_RATE 3
-#define NOISE_LVL 123
-
+#define BUFF_NOISE_SIZE 2048
+#define SaturaLH(N, L, H) (((N)<(L))?(L):(((N)>(H))?(H):(N)))
 /* USER CODE END EC */
 
 /* Exported macro ------------------------------------------------------------*/
 /* USER CODE BEGIN EM */
- typedef enum
- {
-   BUFFER_OFFSET_NONE = 0,
-   BUFFER_OFFSET_HALF,
-   BUFFER_OFFSET_FULL,
-  } RecordBufferOffset_Typedef;
+
 /* USER CODE END EM */
 
 /* Exported functions prototypes ---------------------------------------------*/
 /* USER CODE BEGIN EFP */
- void AudioRecord_TransferComplete_CallBack(void);
-  void AudioRecord_HalfTransfer_CallBack(void);
-  void AudioRecord_Error_CallBack(void);
-  void Select_sample_rate(int w);
-  void micro_init(int sample_choice);
-  void record();
-  void micro_deinit();
-  void NoiseLVL();
+void record(int32_t *buffer, int buffsize);
+  int NoiseLVL();
+  int abs(int num);
 /* USER CODE END EFP */
 
 #ifdef __cplusplus

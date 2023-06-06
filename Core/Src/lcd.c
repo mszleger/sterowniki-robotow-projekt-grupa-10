@@ -21,12 +21,12 @@
 #include "lcd.h"
 
 /* USER CODE BEGIN 0 */
-
+char *str;
+char *new_str;
 /* USER CODE END 0 */
 
 LCD_HandleTypeDef hlcd;
- char *str;
- char *new_str;
+
 /* LCD init function */
 void MX_LCD_Init(void)
 {

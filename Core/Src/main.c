@@ -20,6 +20,7 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "dfsdm.h"
+#include "dma.h"
 #include "i2c.h"
 #include "lcd.h"
 #include "quadspi.h"
@@ -33,6 +34,7 @@
 #include "flash.h"
 #include "dac.h"
 #include "joy.h"
+#include "record.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -138,15 +140,35 @@ void update_joystick(struct joy* joystick, uint8_t* submenu, uint8_t* option) {
 	++joystick_event_id;
 }
 void record_track(uint8_t track_id) {
-	//TODO
+	int32_t buffer[256];
+	if(Flash_Track_Status_Set(track_id, TRACK_SAVED) != HAL_OK) return;
+	display_lcd("FLASHC");
+	Flash_Track_Record_Start(track_id);
+	display_lcd("REC");
+	printf("Cleared flash space\r\n");
+	do {
+		record(buffer, 256);
+	} while(Flash_Track_Record_Buffer_Save((uint8_t *)buffer, 256 * 4) == 256 * 4);
+	display_lcd("DONE");
 	HAL_Delay(1000);
 }
 void play_track(uint8_t track_id) {
-	//TODO
+	uint8_t track_state;
+	if(Flash_Track_Status_Get(track_id, &track_state) != HAL_OK) return;
+	if(track_state == TRACK_EMPTY) {
+		display_lcd("EMPTY");
+		HAL_Delay(1000);
+		return;
+	}
+	if(dac_play_track(track_id) != HAL_OK) {
+		printf("Failed to play track %d", track_id);
+		return;
+	}
+	display_lcd("DONE");
 	HAL_Delay(1000);
 }
 void delete_track(uint8_t track_id) {
-	Flash_Track_Status_Set(track_id, TRACK_EMPTY);
+	if(Flash_Track_Status_Set(track_id, TRACK_EMPTY) != HAL_OK) return;
 	HAL_Delay(1000);
 }
 void switch_auto(uint8_t state) {
@@ -154,8 +176,9 @@ void switch_auto(uint8_t state) {
 	HAL_Delay(1000);
 }
 uint8_t is_there_conversation() {
-	//TODO
-	return 0;
+	int32_t buffer;
+	record(&buffer, 1);
+	return abs(buffer) > 1000;
 }
 
 /* USER CODE END 0 */
@@ -188,6 +211,7 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
+  MX_DMA_Init();
   MX_I2C1_Init();
   MX_QUADSPI_Init();
   MX_SAI1_Init();
@@ -244,7 +268,7 @@ int main(void)
     	option = 0;
     }
     // Conversation detector
-    if(auto_status == AUTO_ENABLED) {
+    if(auto_status != AUTO_DISABLED) {
     	if(is_there_conversation()) {
         	display_lcd("REC");
         	record_track(0);
@@ -278,13 +302,15 @@ void SystemClock_Config(void)
   /** Initializes the RCC Oscillators according to the specified parameters
   * in the RCC_OscInitTypeDef structure.
   */
-  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_LSI|RCC_OSCILLATORTYPE_HSE;
-  RCC_OscInitStruct.HSEState = RCC_HSE_ON;
+  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_LSI|RCC_OSCILLATORTYPE_MSI;
   RCC_OscInitStruct.LSIState = RCC_LSI_ON;
+  RCC_OscInitStruct.MSIState = RCC_MSI_ON;
+  RCC_OscInitStruct.MSICalibrationValue = 0;
+  RCC_OscInitStruct.MSIClockRange = RCC_MSIRANGE_6;
   RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
-  RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSE;
+  RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_MSI;
   RCC_OscInitStruct.PLL.PLLM = 1;
-  RCC_OscInitStruct.PLL.PLLN = 20;
+  RCC_OscInitStruct.PLL.PLLN = 40;
   RCC_OscInitStruct.PLL.PLLP = RCC_PLLP_DIV7;
   RCC_OscInitStruct.PLL.PLLQ = RCC_PLLQ_DIV2;
   RCC_OscInitStruct.PLL.PLLR = RCC_PLLR_DIV2;
@@ -313,10 +339,10 @@ void SystemClock_Config(void)
   PeriphClkInit.Sai1ClockSelection = RCC_SAI1CLKSOURCE_PLLSAI1;
   PeriphClkInit.Dfsdm1ClockSelection = RCC_DFSDM1CLKSOURCE_PCLK;
   PeriphClkInit.RTCClockSelection = RCC_RTCCLKSOURCE_LSI;
-  PeriphClkInit.PLLSAI1.PLLSAI1Source = RCC_PLLSOURCE_HSE;
+  PeriphClkInit.PLLSAI1.PLLSAI1Source = RCC_PLLSOURCE_MSI;
   PeriphClkInit.PLLSAI1.PLLSAI1M = 1;
-  PeriphClkInit.PLLSAI1.PLLSAI1N = 24;
-  PeriphClkInit.PLLSAI1.PLLSAI1P = RCC_PLLP_DIV7;
+  PeriphClkInit.PLLSAI1.PLLSAI1N = 48;
+  PeriphClkInit.PLLSAI1.PLLSAI1P = RCC_PLLP_DIV17;
   PeriphClkInit.PLLSAI1.PLLSAI1Q = RCC_PLLQ_DIV2;
   PeriphClkInit.PLLSAI1.PLLSAI1R = RCC_PLLR_DIV2;
   PeriphClkInit.PLLSAI1.PLLSAI1ClockOut = RCC_PLLSAI1_SAI1CLK;
